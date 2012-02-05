@@ -107,6 +107,10 @@ a comparator and an existing array:
         * http://en.wikipedia.org/wiki/Tree_rotation
         * http://closure-library.googlecode.com/svn/docs/closure_goog_structs_avltree.js.source.html
 
+10. Red and Black Tree Operations & Properties
+    * insert(value) : O(logn)
+    * remove(value) : O(logn)
+    * search(value) : O(logn)
 
 ###Algorithms:
 1. range(range/array, start index, one after end index): Retuns a range of 
