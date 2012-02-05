@@ -799,6 +799,185 @@ DisjointSet.prototype.__defineGetter__('length', function() {
 
 exports.DisjointSet = DisjointSet;
 
+// Red and Black Tree Node 
+// 0 => Black
+// 1 => Red
+
+function RBTreeNode(value, parent, left, right, color) {
+	this.value = value;
+	this.parent = parent;
+	this.left = left;
+	this.right = right;
+	this.color = color;
+}
+
+
+// Red and Black is self balancing binary tree
+// with the following properties
+// 
+// 1. A node is either black or red
+// 2. The root is black
+// 3. All leaves are the same color as the root
+// 4. Both children of every red node are black
+// 5. Every simple path from a give node to any of the 
+// decendant leaves contain the same number of black nodes
+// 
+// The big-O notations for some of the operations are below 
+// ----------------------------------------------------------------------------
+// insert: O(logn)
+// search: O(logn)
+// delete: O(logn)
+
+
+function RB_Tree(){
+	this.root = null;
+}
+
+RB_Tree.prototype = {
+	insert:function(value){
+
+		// Simple binary search tree insert and we color 
+		// the new node red
+		var node = this._bst_insert(value);
+		
+		this._rebalance(node);
+				 
+	},
+	
+	remove:function(value) {
+		
+	},
+   
+	_rebalance:function(node) {
+	
+		// If node is at the root of the tree
+		// just color the node black and return 
+		if (!node.parent) {
+			node.color = 0;
+			return;			
+		}
+
+		// If the node's parent is black 
+		// then awesome we don't have to do 
+		// anything just return
+		if(node.parent.color === 0)
+			return;
+		
+		// If both the parent and uncle of the 
+		//  node are red, then change their 
+		// color to black. Also change the color 
+		// of the grandparent to red. Now this may
+		// violate property 2) if the grandparent is 
+		// the root node. It may also violate property
+		// 4) if the parent of the grand parent is a red 
+		// node. So we recursively call this balancing 
+		// function on the grandparent of the node
+		var gp = this._get_grandparent(node);
+		var uncle = this._get_uncle(node);
+
+		if(uncle && uncle.color == 1) {
+			node.parent.color = 0;
+			uncle.color = 0;
+			gp.color = 1;
+			this._rebalance(gp);
+		}
+		
+		// If the node's parent is red but the uncle 
+		// is black then rotate and move ahead.
+		// 
+		// 1) If the node's parent is left node of it's 
+		// grandparent and the node is right child 
+		// of it's parent then left rotate its parent.
+		// 2) If the node's parent is the right node 
+		// of it's grandparent and the node is left 
+		// child of it's parent then right rotate its 
+		// parent.
+
+		if(node.parent === gp.left && node.parent.right === node) {
+			this._left_rotate(node.parent);
+			node = node.left;
+		}
+		else if (node.parent === gp.right && node.parent.left === node) {
+			this._right_rotate(node.parent);
+			node = node.right;
+			
+		}			
+		
+	},
+	
+	_bst_insert:function(value) {
+
+		// if root is empty, add a new root node
+		// and color it red
+		if(!this.root) {
+			this.root = RBTreeNode(value, null, null, null, 1);
+			return this.root;
+		}
+
+		var node = this.root;
+		var prev = null;
+		while(node) {
+			if (value < node.value)
+				node = node.left;
+			else
+				node = node.right;
+			
+			prev = node;
+		}
+		
+		var n = new RBTreeNode(value, prev, null, null, 1);
+		
+		if (value < prev.value) 
+			prev.left = n;
+		else
+			prev.right = n;
+
+		
+		return n;
+						
+	},
+
+	_left_rotate : function(node){
+		var tmp = node.right;
+		if (node.value < node.parent.value) {
+			node.parent.left = node.right;
+			node.right.parent = node.parent;
+			
+		}
+		else {
+			node.parent.right = node.right;
+			node.right.parent = node.parent;
+		}
+		
+		node.right = tmp.left;
+		tmp.left = node;
+		node.parent = tmp;
+		
+	},
+
+	_right_rotate : function(node) {
+        
+	},
+
+	_get_grandparent:function(node){
+		if(node && node.parent)
+			return node.parent.parent;
+		else
+			return null;
+	},
+	
+	_get_uncle:function(node) {
+		var gp = this._get_grandparent(node);
+		if(!gp)
+			return null;
+		if(gp.left === node.parent)
+			return gp.right;
+		else 
+			return gp.left;
+	}
+	
+};
+
 
 // An AVL Tree Node
 function AVLTreeNode(value, parent, height, weight, left, right) {
